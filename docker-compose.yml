@@ -1,0 +1,26 @@
+version: '3.3'
+
+services:
+  postgresql:
+    image: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - "postgresql-volume:/var/lib/postgresql/data"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=1020304050
+
+  gin_app:
+    build: .
+    links:
+      - postgresql
+    ports:
+     - "8081:8080"
+
+volumes:
+  postgresql-volume:
+    external: true
+
+

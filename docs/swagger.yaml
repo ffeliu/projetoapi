@@ -1,0 +1,158 @@
+definitions:
+  model.Evaluation:
+    properties:
+      Id:
+        type: integer
+      Note:
+        type: string
+      Rating:
+        type: integer
+    type: object
+  model.EvaluationAdd:
+    properties:
+      Note:
+        type: string
+      Rating:
+        type: integer
+    type: object
+  model.EvaluationFullView:
+    properties:
+      Id:
+        type: integer
+      Note:
+        type: string
+      Rating:
+        type: string
+    type: object
+  model.EvaluationPartialView:
+    properties:
+      Id:
+        type: integer
+      Rating:
+        type: string
+    type: object
+  model.EvaluationUpd:
+    properties:
+      Note:
+        type: string
+      Rating:
+        type: integer
+    type: object
+info:
+  contact: {}
+  license: {}
+paths:
+  /evaluation:
+    get:
+      consumes:
+      - application/json
+      description: Exibe a lista, sem todos os campos, de todas as avaliações
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.EvaluationPartialView'
+            type: array
+        "404":
+          description: Not found
+      summary: Recupera as avaliações
+    post:
+      consumes:
+      - application/json
+      description: Cria uma avaliação sobre a utilização da aplicação
+      parameters:
+      - description: Add evaluation
+        in: body
+        name: evaluation
+        required: true
+        schema:
+          $ref: '#/definitions/model.EvaluationAdd'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Evaluation'
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+      summary: Adicionar uma avaliação
+  /evaluation/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Exclui uma avaliação realizada
+      operationId: get-string-by-int
+      parameters:
+      - description: Evaluation ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Evaluation'
+        "404":
+          description: Not found
+      summary: Exclui uma avaliação pelo ID
+    get:
+      consumes:
+      - application/json
+      description: Exibe os detalhes de uma avaliação pelo ID
+      operationId: get-string-by-int
+      parameters:
+      - description: Evaluation ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.EvaluationFullView'
+        "404":
+          description: Not found
+      summary: Recupera uma avaliação pelo id
+    put:
+      consumes:
+      - application/json
+      description: Atualiza uma avaliação sobre a utilização da aplicação
+      parameters:
+      - description: Udpdate evaluation
+        in: body
+        name: evaluation
+        required: true
+        schema:
+          $ref: '#/definitions/model.EvaluationUpd'
+          type: object
+      - description: Evaluation ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Evaluation'
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+      summary: Atualiza uma avaliação
+swagger: "2.0"

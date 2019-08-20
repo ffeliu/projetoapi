@@ -1,0 +1,241 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {},
+        "license": {}
+    },
+    "paths": {
+        "/evaluation": {
+            "get": {
+                "description": "Exibe a lista, sem todos os campos, de todas as avaliações",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Recupera as avaliações",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.EvaluationPartialView"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            },
+            "post": {
+                "description": "Cria uma avaliação sobre a utilização da aplicação",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Adicionar uma avaliação",
+                "parameters": [
+                    {
+                        "description": "Add evaluation",
+                        "name": "evaluation",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/model.EvaluationAdd"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/model.Evaluation"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
+        },
+        "/evaluation/{id}": {
+            "get": {
+                "description": "Exibe os detalhes de uma avaliação pelo ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Recupera uma avaliação pelo id",
+                "operationId": "get-string-by-int",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Evaluation ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.EvaluationFullView"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            },
+            "put": {
+                "description": "Atualiza uma avaliação sobre a utilização da aplicação",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Atualiza uma avaliação",
+                "parameters": [
+                    {
+                        "description": "Udpdate evaluation",
+                        "name": "evaluation",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/model.EvaluationUpd"
+                        }
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Evaluation ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Evaluation"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            },
+            "delete": {
+                "description": "Exclui uma avaliação realizada",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Exclui uma avaliação pelo ID",
+                "operationId": "get-string-by-int",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Evaluation ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Evaluation"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "model.Evaluation": {
+            "type": "object",
+            "properties": {
+                "Id": {
+                    "type": "integer"
+                },
+                "Note": {
+                    "type": "string"
+                },
+                "Rating": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.EvaluationAdd": {
+            "type": "object",
+            "properties": {
+                "Note": {
+                    "type": "string"
+                },
+                "Rating": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.EvaluationFullView": {
+            "type": "object",
+            "properties": {
+                "Id": {
+                    "type": "integer"
+                },
+                "Note": {
+                    "type": "string"
+                },
+                "Rating": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.EvaluationPartialView": {
+            "type": "object",
+            "properties": {
+                "Id": {
+                    "type": "integer"
+                },
+                "Rating": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.EvaluationUpd": {
+            "type": "object",
+            "properties": {
+                "Note": {
+                    "type": "string"
+                },
+                "Rating": {
+                    "type": "integer"
+                }
+            }
+        }
+    }
+}

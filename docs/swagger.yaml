@@ -1,4 +1,11 @@
 definitions:
+  model.Credentials:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
   model.Evaluation:
     properties:
       Id:
@@ -42,6 +49,31 @@ info:
   contact: {}
   license: {}
 paths:
+  /auth:
+    post:
+      consumes:
+      - application/json
+      description: Autentica o usuário e gera o token para os próximos acessos
+      parameters:
+      - description: Do login
+        in: body
+        name: evaluation
+        required: true
+        schema:
+          $ref: '#/definitions/model.Credentials'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Credentials'
+        "400":
+          description: Bad request
+        "401":
+          description: Unauthorized
+      summary: Realizar autenticação
   /evaluation:
     get:
       consumes:

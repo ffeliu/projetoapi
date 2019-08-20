@@ -5,6 +5,44 @@
         "license": {}
     },
     "paths": {
+        "/auth": {
+            "post": {
+                "description": "Autentica o usuário e gera o token para os próximos acessos",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Realizar autenticação",
+                "parameters": [
+                    {
+                        "description": "Do login",
+                        "name": "evaluation",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/model.Credentials"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Credentials"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
         "/evaluation": {
             "get": {
                 "description": "Exibe a lista, sem todos os campos, de todas as avaliações",
@@ -176,6 +214,17 @@
         }
     },
     "definitions": {
+        "model.Credentials": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
         "model.Evaluation": {
             "type": "object",
             "properties": {

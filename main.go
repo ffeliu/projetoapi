@@ -74,6 +74,7 @@ func main() {
 }
 
 func formatSwagger() {
+	//http://localhost:8080/swagger/index.html
 	// programatically set swagger info
 	docs.SwaggerInfo.Title = "API de avaliações"
 	docs.SwaggerInfo.Description = "Essa api permite manter todas as avaliações realizadas."
@@ -260,6 +261,15 @@ func addEvaluation(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"status": http.StatusCreated, "message": "Avaliação criada com sucesso!", "resourceId": evaluation.Id})
 }
 
+// @Summary Realizar autenticação
+// @Description Autentica o usuário e gera o token para os próximos acessos
+// @Accept  json
+// @Produce  json
+// @Router /auth [post]
+// @Param evaluation body model.Credentials true "Do login"
+// @Success 200 {object} model.Credentials
+// @Failure 400 "Bad request"
+// @Failure 401 "Unauthorized"
 func doAuthentication(c *gin.Context) {
 	var creds model.Credentials
 

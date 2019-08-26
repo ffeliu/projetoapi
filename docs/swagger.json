@@ -6,6 +6,42 @@
     },
     "paths": {
         "/auth": {
+            "put": {
+                "description": "Atualiza o token de autenticação do usuário",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Atualiza token de autenticação",
+                "parameters": [
+                    {
+                        "description": "Refresh token",
+                        "name": "evaluation",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/model.Users"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "$ref": "#/definitions/model.Users"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            },
             "post": {
                 "description": "Autentica o usuário e gera o token para os próximos acessos",
                 "consumes": [
@@ -23,7 +59,7 @@
                         "required": true,
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/model.Credentials"
+                            "$ref": "#/definitions/model.Users"
                         }
                     }
                 ],
@@ -31,7 +67,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.Credentials"
+                            "$ref": "#/definitions/model.Users"
                         }
                     },
                     "400": {
@@ -45,6 +81,11 @@
         },
         "/evaluation": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Exibe a lista, sem todos os campos, de todas as avaliações",
                 "consumes": [
                     "application/json"
@@ -53,6 +94,15 @@
                     "application/json"
                 ],
                 "summary": "Recupera as avaliações",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -69,6 +119,11 @@
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Cria uma avaliação sobre a utilização da aplicação",
                 "consumes": [
                     "application/json"
@@ -78,6 +133,13 @@
                 ],
                 "summary": "Adicionar uma avaliação",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Token",
+                        "name": "Bearer",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "description": "Add evaluation",
                         "name": "evaluation",
@@ -107,6 +169,11 @@
         },
         "/evaluation/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Exibe os detalhes de uma avaliação pelo ID",
                 "consumes": [
                     "application/json"
@@ -117,6 +184,13 @@
                 "summary": "Recupera uma avaliação pelo id",
                 "operationId": "get-string-by-int",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Token",
+                        "name": "Bearer",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "integer",
                         "description": "Evaluation ID",
@@ -138,6 +212,11 @@
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Atualiza uma avaliação sobre a utilização da aplicação",
                 "consumes": [
                     "application/json"
@@ -147,6 +226,13 @@
                 ],
                 "summary": "Atualiza uma avaliação",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Token",
+                        "name": "Bearer",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "description": "Udpdate evaluation",
                         "name": "evaluation",
@@ -181,6 +267,11 @@
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Exclui uma avaliação realizada",
                 "consumes": [
                     "application/json"
@@ -191,6 +282,13 @@
                 "summary": "Exclui uma avaliação pelo ID",
                 "operationId": "get-string-by-int",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Token",
+                        "name": "Bearer",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "integer",
                         "description": "Evaluation ID",
@@ -214,17 +312,6 @@
         }
     },
     "definitions": {
-        "model.Credentials": {
-            "type": "object",
-            "properties": {
-                "password": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
-        },
         "model.Evaluation": {
             "type": "object",
             "properties": {
@@ -283,6 +370,17 @@
                 },
                 "Rating": {
                     "type": "integer"
+                }
+            }
+        },
+        "model.Users": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
                 }
             }
         }

@@ -2,9 +2,8 @@ package main
 
 import (
 	"net/http"
+	"strings"
 	"time"
-
-	//"time"
 
 	"projetoapi/docs"
 
@@ -23,11 +22,6 @@ var db *gorm.DB
 
 // Create the JWT key used to create the signature
 var jwtKey = []byte("my_secret_key")
-
-var users = map[string]string{
-	"user1": "password1",
-	"user2": "password2",
-}
 
 // Create a struct that will be encoded to a JWT.
 // We add jwt.StandardClaims as an embedded type, to provide fields like expiry time
@@ -67,6 +61,7 @@ func main() {
 	auth := router.Group("api/v1/auth")
 	{
 		auth.POST("/", doAuthentication)
+		auth.PUT("/", refreshToken)
 	}
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
@@ -75,11 +70,10 @@ func main() {
 
 func formatSwagger() {
 	//http://localhost:8080/swagger/index.html
-	// programatically set swagger info
 	docs.SwaggerInfo.Title = "API de avaliações"
 	docs.SwaggerInfo.Description = "Essa api permite manter todas as avaliações realizadas."
 	docs.SwaggerInfo.Version = "1.0"
-	docs.SwaggerInfo.Host = "localhost:8081"
+	docs.SwaggerInfo.Host = "localhost:8080"
 	docs.SwaggerInfo.BasePath = "/api/v1"
 	docs.SwaggerInfo.Schemes = []string{"http", "https"}
 }
@@ -88,6 +82,8 @@ func formatSwagger() {
 // @Description Exibe a lista, sem todos os campos, de todas as avaliações
 // @Accept  json
 // @Produce  json
+// @Security BearerAuth
+// @param Authorization header string true "Token"
 // @Success 200 {array} model.EvaluationPartialView
 // @Router /evaluation [get]
 // @Failure 404 "Not found"
@@ -95,9 +91,7 @@ func getAllEvaluation(c *gin.Context) {
 	var evaluations []model.Evaluation
 	var _evaluationPartialView []model.EvaluationPartialView
 
-	token := c.Request.Header.Get("Authorization")
-
-	if !validateToken(token) {
+	if !validateToken(c) {
 		c.JSON(http.StatusUnauthorized, gin.H{"status": http.StatusUnauthorized, "message": "Acesso não autorizado"})
 		return
 	}
@@ -139,6 +133,8 @@ func getAllEvaluation(c *gin.Context) {
 // @ID get-string-by-int
 // @Accept  json
 // @Produce  json
+// @Security BearerAuth
+// @param Bearer header string true "Token"
 // @Param id path int true "Evaluation ID"
 // @Success 200 {object} model.EvaluationFullView
 // @Router /evaluation/{id} [get]
@@ -147,6 +143,11 @@ func getEvaluationById(c *gin.Context) {
 	var evaluation model.Evaluation
 	id := c.Param("id")
 	ratingDesc := ""
+
+	if !validateToken(c) {
+		c.JSON(http.StatusUnauthorized, gin.H{"status": http.StatusUnauthorized, "message": "Acesso não autorizado"})
+		return
+	}
 
 	db.First(&evaluation, id)
 	if evaluation.Id == 0 {
@@ -175,6 +176,8 @@ func getEvaluationById(c *gin.Context) {
 // @Description Atualiza uma avaliação sobre a utilização da aplicação
 // @Accept  json
 // @Produce  json
+// @Security BearerAuth
+// @param Bearer header string true "Token"
 // @Param evaluation body model.EvaluationUpd true "Udpdate evaluation"
 // @Param id path int true "Evaluation ID"
 // @Router /evaluation/{id} [put]
@@ -185,8 +188,13 @@ func updateEvaluation(c *gin.Context) {
 	var updEvaluation model.EvaluationUpd
 	var evaluation model.Evaluation
 
+	if !validateToken(c) {
+		c.JSON(http.StatusUnauthorized, gin.H{"status": http.StatusUnauthorized, "message": "Acesso não autorizado"})
+		return
+	}
+
 	if err := c.ShouldBindJSON(&updEvaluation); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "message": "Bad request!"})
+		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "message": "Sintaxe de requisição mal formada!"})
 		return
 	}
 
@@ -212,6 +220,8 @@ func updateEvaluation(c *gin.Context) {
 // @ID get-string-by-int
 // @Accept  json
 // @Produce  json
+// @Security BearerAuth
+// @param Bearer header string true "Token"
 // @Param id path int true "Evaluation ID"
 // @Router /evaluation/{id} [delete]
 // @Success 200 {object} model.Evaluation
@@ -219,8 +229,12 @@ func updateEvaluation(c *gin.Context) {
 func deleteEvaluation(c *gin.Context) {
 	var evaluation model.Evaluation
 
-	id := c.Param("id")
+	if !validateToken(c) {
+		c.JSON(http.StatusUnauthorized, gin.H{"status": http.StatusUnauthorized, "message": "Acesso não autorizado"})
+		return
+	}
 
+	id := c.Param("id")
 	db.First(&evaluation, id)
 
 	if evaluation.Id == 0 {
@@ -237,6 +251,8 @@ func deleteEvaluation(c *gin.Context) {
 // @Description Cria uma avaliação sobre a utilização da aplicação
 // @Accept  json
 // @Produce  json
+// @Security BearerAuth
+// @param Bearer header string true "Token"
 // @Param evaluation body model.EvaluationAdd true "Add evaluation"
 // @Router /evaluation [post]
 // @Success 201 {object} model.Evaluation
@@ -246,8 +262,13 @@ func addEvaluation(c *gin.Context) {
 
 	var addEvaluation model.EvaluationAdd
 
+	if !validateToken(c) {
+		c.JSON(http.StatusUnauthorized, gin.H{"status": http.StatusUnauthorized, "message": "Acesso não autorizado"})
+		return
+	}
+
 	if err := c.ShouldBindJSON(&addEvaluation); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "message": "Bad request!"})
+		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "message": "Sintaxe de requisição mal formada!"})
 		return
 	}
 
@@ -266,26 +287,22 @@ func addEvaluation(c *gin.Context) {
 // @Accept  json
 // @Produce  json
 // @Router /auth [post]
-// @Param evaluation body model.Credentials true "Do login"
-// @Success 200 {object} model.Credentials
+// @Param evaluation body model.Users true "Do login"
+// @Success 200 {object} model.Users
 // @Failure 400 "Bad request"
 // @Failure 401 "Unauthorized"
 func doAuthentication(c *gin.Context) {
-	var creds model.Credentials
+	var creds model.Users
+	var usr model.Users
 
 	if err := c.ShouldBindJSON(&creds); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "message": "Bad request!"})
+		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "message": "Sintaxe de requisição mal formada!"})
 		return
 	}
 
-	// Get the expected password from our in memory map
-	expectedPassword, ok := users[creds.Username]
-
-	// If a password exists for the given user
-	// AND, if it is the same as the password we received, the we can move ahead
-	// if NOT, then we return an "Unauthorized" status
-	if !ok || expectedPassword != creds.Password {
-		c.JSON(http.StatusUnauthorized, gin.H{"status": http.StatusUnauthorized, "message": "Acesso não autorizado"})
+	db.Find(&usr, "username = ? and password = ?", creds.Username, creds.Password)
+	if usr.Username == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"status": http.StatusUnauthorized, "message": "Usuário não encontrado"})
 		return
 	}
 
@@ -296,13 +313,12 @@ func doAuthentication(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "message": "Login realizadom com sucesso!", "token": token})
+	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "message": "Login realizado com sucesso!", "token": token})
 }
 
-func getToken(creds model.Credentials) string {
+func getToken(creds model.Users) string {
 
-	// Declare the expiration time of the token
-	// here, we have kept it as 5 minutes
+	// Set expiration time of the token
 	expirationTime := time.Now().Add(5 * time.Minute)
 
 	// Create the JWT claims, which includes the username and expiry time
@@ -326,6 +342,71 @@ func getToken(creds model.Credentials) string {
 	return tokenString
 }
 
-func validateToken(token string) bool {
-	return false
+func validateToken(c *gin.Context) bool {
+
+	var token string
+
+	reqToken := c.Request.Header.Get("Authorization")
+	if strings.Contains(reqToken, "Bearer") {
+		if strings.TrimSpace(reqToken) == "" {
+			return false
+		}
+
+		splitToken := strings.Split(reqToken, "Bearer")
+		token = strings.TrimSpace(splitToken[1])
+	} else {
+		token = strings.TrimSpace(reqToken)
+	}
+
+	claims := &Claims{}
+
+	tkn, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
+		return jwtKey, nil
+	})
+
+	if err != nil {
+		if err == jwt.ErrSignatureInvalid {
+			return false
+		}
+	}
+
+	if !tkn.Valid {
+		return false
+	}
+
+	return true
+}
+
+// @Summary Atualiza token de autenticação
+// @Description Atualiza o token de autenticação do usuário
+// @Accept  json
+// @Produce  json
+// @Router /auth [put]
+// @Param evaluation body model.Users true "Refresh token"
+// @Success 204 {object} model.Users
+// @Failure 400 "Bad request"
+// @Failure 401 "Unauthorized"
+func refreshToken(c *gin.Context) {
+	var user model.Users
+	var usr model.Users
+
+	if err := c.ShouldBindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "message": "Sintaxe de requisição mal formada!"})
+		return
+	}
+
+	db.Find(&usr, "username = ? and password = ?", user.Username, user.Password)
+	if usr.Username == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"status": http.StatusUnauthorized, "message": "Acesso não autorizado"})
+		return
+	}
+
+	token := getToken(user)
+
+	if token == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"status": http.StatusUnauthorized, "message": "Acesso não autorizado"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"status": http.StatusNoContent, "message": "Token atualizado com sucesso!", "token": token})
 }

@@ -1,11 +1,4 @@
 definitions:
-  model.Credentials:
-    properties:
-      password:
-        type: string
-      username:
-        type: string
-    type: object
   model.Evaluation:
     properties:
       Id:
@@ -45,6 +38,13 @@ definitions:
       Rating:
         type: integer
     type: object
+  model.Users:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
 info:
   contact: {}
   license: {}
@@ -60,7 +60,7 @@ paths:
         name: evaluation
         required: true
         schema:
-          $ref: '#/definitions/model.Credentials'
+          $ref: '#/definitions/model.Users'
           type: object
       produces:
       - application/json
@@ -68,17 +68,47 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.Credentials'
+            $ref: '#/definitions/model.Users'
         "400":
           description: Bad request
         "401":
           description: Unauthorized
       summary: Realizar autenticação
+    put:
+      consumes:
+      - application/json
+      description: Atualiza o token de autenticação do usuário
+      parameters:
+      - description: Refresh token
+        in: body
+        name: evaluation
+        required: true
+        schema:
+          $ref: '#/definitions/model.Users'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/model.Users'
+        "400":
+          description: Bad request
+        "401":
+          description: Unauthorized
+      summary: Atualiza token de autenticação
   /evaluation:
     get:
       consumes:
       - application/json
       description: Exibe a lista, sem todos os campos, de todas as avaliações
+      parameters:
+      - description: Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -90,12 +120,19 @@ paths:
             type: array
         "404":
           description: Not found
+      security:
+      - BearerAuth: []
       summary: Recupera as avaliações
     post:
       consumes:
       - application/json
       description: Cria uma avaliação sobre a utilização da aplicação
       parameters:
+      - description: Token
+        in: header
+        name: Bearer
+        required: true
+        type: string
       - description: Add evaluation
         in: body
         name: evaluation
@@ -114,6 +151,8 @@ paths:
           description: Bad request
         "404":
           description: Not found
+      security:
+      - BearerAuth: []
       summary: Adicionar uma avaliação
   /evaluation/{id}:
     delete:
@@ -122,6 +161,11 @@ paths:
       description: Exclui uma avaliação realizada
       operationId: get-string-by-int
       parameters:
+      - description: Token
+        in: header
+        name: Bearer
+        required: true
+        type: string
       - description: Evaluation ID
         in: path
         name: id
@@ -136,6 +180,8 @@ paths:
             $ref: '#/definitions/model.Evaluation'
         "404":
           description: Not found
+      security:
+      - BearerAuth: []
       summary: Exclui uma avaliação pelo ID
     get:
       consumes:
@@ -143,6 +189,11 @@ paths:
       description: Exibe os detalhes de uma avaliação pelo ID
       operationId: get-string-by-int
       parameters:
+      - description: Token
+        in: header
+        name: Bearer
+        required: true
+        type: string
       - description: Evaluation ID
         in: path
         name: id
@@ -157,12 +208,19 @@ paths:
             $ref: '#/definitions/model.EvaluationFullView'
         "404":
           description: Not found
+      security:
+      - BearerAuth: []
       summary: Recupera uma avaliação pelo id
     put:
       consumes:
       - application/json
       description: Atualiza uma avaliação sobre a utilização da aplicação
       parameters:
+      - description: Token
+        in: header
+        name: Bearer
+        required: true
+        type: string
       - description: Udpdate evaluation
         in: body
         name: evaluation
@@ -186,5 +244,7 @@ paths:
           description: Bad request
         "404":
           description: Not found
+      security:
+      - BearerAuth: []
       summary: Atualiza uma avaliação
 swagger: "2.0"

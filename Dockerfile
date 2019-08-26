@@ -13,6 +13,7 @@ RUN go get -u github.com/swaggo/files
 RUN go get -u github.com/swaggo/http-swagger
 RUN go get -u github.com/gin-contrib/cors
 RUN go get -u github.com/rs/cors/wrapper/gin
+RUN go get -u github.com/dgrijalva/jwt-go
 
 # Add Maintainer Info
 LABEL maintainer="Fernando Feliu"

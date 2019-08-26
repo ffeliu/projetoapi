@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strings"
 	"time"
@@ -21,7 +23,7 @@ import (
 var db *gorm.DB
 
 // Create the JWT key used to create the signature
-var jwtKey = []byte("my_secret_key")
+var jwtKey = getSecretKey()
 
 // Create a struct that will be encoded to a JWT.
 // We add jwt.StandardClaims as an embedded type, to provide fields like expiry time
@@ -76,6 +78,18 @@ func formatSwagger() {
 	docs.SwaggerInfo.Host = "localhost:8080"
 	docs.SwaggerInfo.BasePath = "/api/v1"
 	docs.SwaggerInfo.Schemes = []string{"http", "https"}
+}
+
+func getSecretKey() []byte {
+	b, err := ioutil.ReadFile("secret/secretKey.key")
+
+	if err != nil {
+		fmt.Print(err)
+	}
+
+	secretKey := string(b)
+
+	return []byte(secretKey)
 }
 
 // @Summary Recupera as avaliações

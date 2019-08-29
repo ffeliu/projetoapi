@@ -22,9 +22,9 @@ import (
 
 var db *gorm.DB
 
-const hostname = "localhost"
+//const hostname = "localhost"
 
-//const hostname = "172.31.0.2"
+const hostname = "172.18.0.2"
 
 // Create the JWT key used to create the signature
 var jwtKey = getSecretKey()
@@ -79,7 +79,7 @@ func formatSwagger() {
 	docs.SwaggerInfo.Title = "API de avaliações"
 	docs.SwaggerInfo.Description = "Essa api permite manter todas as avaliações realizadas."
 	docs.SwaggerInfo.Version = "1.0"
-	docs.SwaggerInfo.Host = "localhost:8080"
+	docs.SwaggerInfo.Host = "localhost:8082"
 	docs.SwaggerInfo.BasePath = "/api/v1"
 	docs.SwaggerInfo.Schemes = []string{"http", "https"}
 }

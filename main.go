@@ -22,6 +22,10 @@ import (
 
 var db *gorm.DB
 
+const hostname = "localhost"
+
+//const hostname = "172.31.0.2"
+
 // Create the JWT key used to create the signature
 var jwtKey = getSecretKey()
 
@@ -36,7 +40,7 @@ func init() {
 	// http://gorm.io/docs/connecting_to_the_database.html
 	//open a db connection
 	var err error
-	db, err = gorm.Open("postgres", "host=localhost port=5432 user=postgres dbname=EvaluationDB password=1020304050 sslmode=disable")
+	db, err = gorm.Open("postgres", "host="+hostname+" port=5432 user=postgres dbname=EvaluationDB password=1020304050 sslmode=disable")
 
 	if err != nil {
 		panic("failed to connect database")
@@ -148,7 +152,7 @@ func getAllEvaluation(c *gin.Context) {
 // @Accept  json
 // @Produce  json
 // @Security BearerAuth
-// @param Bearer header string true "Token"
+// @param Authorization header string true "Token"
 // @Param id path int true "Evaluation ID"
 // @Success 200 {object} model.EvaluationFullView
 // @Router /evaluation/{id} [get]
@@ -191,7 +195,7 @@ func getEvaluationById(c *gin.Context) {
 // @Accept  json
 // @Produce  json
 // @Security BearerAuth
-// @param Bearer header string true "Token"
+// @param Authorization header string true "Token"
 // @Param evaluation body model.EvaluationUpd true "Udpdate evaluation"
 // @Param id path int true "Evaluation ID"
 // @Router /evaluation/{id} [put]
@@ -235,7 +239,7 @@ func updateEvaluation(c *gin.Context) {
 // @Accept  json
 // @Produce  json
 // @Security BearerAuth
-// @param Bearer header string true "Token"
+// @param Authorization header string true "Token"
 // @Param id path int true "Evaluation ID"
 // @Router /evaluation/{id} [delete]
 // @Success 200 {object} model.Evaluation
@@ -266,7 +270,7 @@ func deleteEvaluation(c *gin.Context) {
 // @Accept  json
 // @Produce  json
 // @Security BearerAuth
-// @param Bearer header string true "Token"
+// @param Authorization header string true "Token"
 // @Param evaluation body model.EvaluationAdd true "Add evaluation"
 // @Router /evaluation [post]
 // @Success 201 {object} model.Evaluation

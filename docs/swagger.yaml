@@ -1,3 +1,4 @@
+basePath: '{{.BasePath}}'
 definitions:
   model.Evaluation:
     properties:
@@ -45,9 +46,13 @@ definitions:
       username:
         type: string
     type: object
+host: '{{.Host}}'
 info:
   contact: {}
+  description: Exibe a lista, sem todos os campos, de todas as avaliações
   license: {}
+  title: '{{.Title}}'
+  version: '{{.Version}}'
 paths:
   /auth:
     post:
@@ -130,7 +135,7 @@ paths:
       parameters:
       - description: Token
         in: header
-        name: Bearer
+        name: Authorization
         required: true
         type: string
       - description: Add evaluation
@@ -163,7 +168,7 @@ paths:
       parameters:
       - description: Token
         in: header
-        name: Bearer
+        name: Authorization
         required: true
         type: string
       - description: Evaluation ID
@@ -191,7 +196,7 @@ paths:
       parameters:
       - description: Token
         in: header
-        name: Bearer
+        name: Authorization
         required: true
         type: string
       - description: Evaluation ID
@@ -218,7 +223,7 @@ paths:
       parameters:
       - description: Token
         in: header
-        name: Bearer
+        name: Authorization
         required: true
         type: string
       - description: Udpdate evaluation

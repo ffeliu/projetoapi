@@ -1,9 +1,14 @@
 {
     "swagger": "2.0",
     "info": {
+        "description": "Exibe a lista, sem todos os campos, de todas as avaliações",
+        "title": "{{.Title}}",
         "contact": {},
-        "license": {}
+        "license": {},
+        "version": "{{.Version}}"
     },
+    "host": "{{.Host}}",
+    "basePath": "{{.BasePath}}",
     "paths": {
         "/auth": {
             "put": {
@@ -136,7 +141,7 @@
                     {
                         "type": "string",
                         "description": "Token",
-                        "name": "Bearer",
+                        "name": "Authorization",
                         "in": "header",
                         "required": true
                     },
@@ -187,7 +192,7 @@
                     {
                         "type": "string",
                         "description": "Token",
-                        "name": "Bearer",
+                        "name": "Authorization",
                         "in": "header",
                         "required": true
                     },
@@ -229,7 +234,7 @@
                     {
                         "type": "string",
                         "description": "Token",
-                        "name": "Bearer",
+                        "name": "Authorization",
                         "in": "header",
                         "required": true
                     },
@@ -285,7 +290,7 @@
                     {
                         "type": "string",
                         "description": "Token",
-                        "name": "Bearer",
+                        "name": "Authorization",
                         "in": "header",
                         "required": true
                     },
